@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111827"><title>Fotos Duplicadas</title>
+<style>
+:root{color-scheme:light;--panel:#fff;--panel2:#f1f5f9;--text:#172033;--muted:#657187;--accent:#4263eb;--border:#e1e7f0;--good:#18a879}
+*{box-sizing:border-box}
+body{margin:0;background:#f5f7fb;color:var(--text);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:22px 18px 20px;background:#fff;border-bottom:1px solid var(--border)}
+header h1{margin:0 0 5px;font-size:25px;letter-spacing:-.4px}
+header p{margin:0;color:var(--muted);font-size:14px}
+main{max-width:980px;margin:auto;padding:14px;display:grid;gap:12px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:16px;box-shadow:0 2px 8px #17203308}
+h2{font-size:17px;margin:0 0 12px;letter-spacing:-.2px}
+.actions,.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.filelabel{border:1px solid transparent;border-radius:10px;padding:11px 14px;font:600 14px system-ui;cursor:pointer;display:inline-flex;justify-content:center;align-items:center;gap:7px}
+.primary,.filelabel{background:var(--accent);color:#fff}
+.secondary{background:#fff;color:#27344a;border-color:#d7dfeb}
+button:disabled{opacity:.45;cursor:not-allowed}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.note{font-size:13px;color:var(--muted);margin:10px 0 0}
+.status{margin-top:12px;color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.progress{height:6px;background:#e8edf5;border-radius:9px;overflow:hidden;margin-top:9px}
+.progress>div{height:100%;width:0;background:var(--good);transition:width .15s}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:13px 0}
+.stat{background:#f8faff;border:1px solid var(--border);border-radius:11px;padding:10px}
+.stat b{font-size:21px;display:block;color:#243b78}
+.stat span{font-size:12px;color:var(--muted)}
+.toolbar{margin:10px 0}
+.toolbar button{padding:8px 10px;font-size:12px}
+.group{border:1px solid var(--border);border-radius:12px;margin:12px 0;overflow:hidden;background:#fff}
+.grouphead{background:#f7f9fd;padding:10px 12px;display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.grouphead small{color:var(--muted)}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;padding:10px}
+.photo{min-width:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}
+.photo.selected{outline:2px solid var(--accent);border-color:var(--accent)}
+.photo img{width:100%;height:125px;object-fit:cover;display:block;background:#eef2f7}
+.photo .info{padding:8px}
+.name{font-size:12px;overflow-wrap:anywhere;min-height:34px;color:#27344a}
+.meta{font-size:11px;color:var(--muted);margin-top:4px}
+.pick{display:flex;gap:7px;align-items:center;font-size:12px;margin-bottom:5px;color:#34415a}
+.pick input{width:17px;height:17px;accent-color:var(--accent)}
+.empty{color:var(--muted);text-align:center;padding:24px 10px;font-size:14px}
+select{background:#fff;color:var(--text);border:1px solid #d7dfeb;border-radius:10px;padding:10px;font:14px system-ui}
+.foot{font-size:12px;color:var(--muted);padding:0 4px 20px}
+@media(min-width:700px){main{grid-template-columns:1fr 1fr}.results{grid-column:1/-1}}
+</style></head><body>
+<header><h1>📷 Fotos Duplicadas</h1><p>Encontre fotos duplicadas e parecidas de um jeito simples.</p></header>
+<main>
+<section class="panel"><h2>1. Escolher fotos</h2><div class="actions"><label class="filelabel" for="files">＋ Selecionar fotos</label><input id="files" type="file" accept="image/*" multiple><button id="analyze" class="primary" disabled>Analisar fotos</button></div><p class="note">Selecione quantas fotos quiser. A quantidade depende da memória disponível no aparelho. A análise acontece localmente, sem enviar suas fotos para a internet.</p><div class="status" id="fileStatus">Nenhuma foto selecionada.</div><div class="progress"><div id="bar"></div></div></section>
+<section class="panel"><h2>2. Opções de análise</h2><label for="similarity">Sensibilidade para fotos parecidas</label><div class="actions" style="margin-top:8px"><select id="similarity"><option value="4">Mais rigorosa</option><option value="8" selected>Equilibrada</option><option value="13">Mais permissiva</option></select></div><p class="note">A comparação visual encontra possíveis duplicatas, mas fotos parecidas podem não ser iguais. Confira cada seleção antes de remover qualquer arquivo.</p><div class="stats"><div class="stat"><b id="countPhotos">0</b><span>Fotos carregadas</span></div><div class="stat"><b id="countGroups">0</b><span>Grupos encontrados</span></div><div class="stat"><b id="countSelected">0</b><span>Selecionadas</span></div></div><div class="actions"><button id="selectExtras" class="secondary" disabled>Selecionar extras dos grupos</button><button id="clearSelected" class="secondary" disabled>Limpar seleção</button></div></section>
+<section class="panel results"><h2>3. Revisar resultados</h2><p class="note">Marque manualmente as fotos que deseja remover. Por segurança, um HTML comum não consegue apagar os arquivos originais diretamente. Ele exporta a lista escolhida; a exclusão real depende de recursos nativos do app usado para converter o HTML em APK.</p><div class="toolbar"><button id="showAll" class="secondary" disabled>Mostrar todas</button><button id="showExact" class="secondary" disabled>Somente iguais</button><button id="showSimilar" class="secondary" disabled>Somente parecidas</button><button id="exportList" class="secondary" disabled>Exportar lista selecionada</button></div><div id="results"><div class="empty">Selecione fotos e toque em “Analisar fotos”.</div></div></section>
+<div class="foot">Fotos Duplicadas • Análise local no aparelho. Faça uma conferência manual antes de remover qualquer arquivo.</div></main>
+<script>
+const $=id=>document.getElementById(id);let files=[],items=[],groups=[],selected=new Set(),filter='all',busy=false;
+const fmtBytes=n=>n<1024?`${n} B`:n<1048576?`${(n/1024).toFixed(1)} KB`:`${(n/1048576).toFixed(1)} MB`;
+function updateStats(){$('countPhotos').textContent=items.length;$('countGroups').textContent=groups.length;$('countSelected').textContent=selected.size;$('clearSelected').disabled=!selected.size;$('exportList').disabled=!selected.size;$('selectExtras').disabled=!groups.length;['showAll','showExact','showSimilar'].forEach(id=>$(id).disabled=!groups.length)}
+$('files').addEventListener('change',e=>{files=Array.from(e.target.files||[]).filter(f=>f.type.startsWith('image/'));items=[];groups=[];selected.clear();$('analyze').disabled=!files.length;$('fileStatus').textContent=files.length?`${files.length} foto(s) escolhida(s). Total: ${fmtBytes(files.reduce((s,f)=>s+f.size,0))}.`:'Nenhuma foto selecionada.';$('results').innerHTML='<div class="empty">Toque em “Analisar fotos” para começar.</div>';$('bar').style.width='0%';updateStats()});
+function loadImage(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),im=new Image();im.onload=()=>resolve({im,url});im.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Não foi possível abrir '+file.name))};im.src=url})}
+function signature(img){const c=document.createElement('canvas');c.width=9;c.height=8;const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,9,8);const d=ctx.getImageData(0,0,9,8).data;let gray=[],bits='';for(let i=0;i<72;i++){const p=i*4;gray.push((d[p]*299+d[p+1]*587+d[p+2]*114)/1000)}for(let y=0;y<8;y++)for(let x=0;x<8;x++)bits+=gray[y*9+x]>gray[y*9+x+1]?'1':'0';return bits}
+function distance(a,b){let n=0;for(let i=0;i<Math.min(a.length,b.length);i++)if(a[i]!==b[i])n++;return n}
+async function analyze(){if(busy||!files.length)return;busy=true;$('analyze').disabled=true;$('fileStatus').textContent='Analisando fotos…';items=[];groups=[];selected.clear();try{for(let i=0;i<files.length;i++){const f=files[i];try{const {im,url}=await loadImage(f);items.push({id:i,file:f,name:f.name,size:f.size,url,hash:signature(im),width:im.naturalWidth,height:im.naturalHeight})}catch(err){console.warn(err)}$('bar').style.width=`${Math.round((i+1)/files.length*100)}%`;$('fileStatus').textContent=`Analisando ${i+1} de ${files.length}: ${f.name}`;if(i%8===0)await new Promise(r=>setTimeout(r,0))}
+const parent=items.map((_,i)=>i),root=i=>{while(parent[i]!==i){parent[i]=parent[parent[i]];i=parent[i]}return i},join=(a,b)=>{a=root(a);b=root(b);if(a!==b)parent[b]=a},threshold=Number($('similarity').value);
+for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){const same=items[i].width===items[j].width&&items[i].height===items[j].height,d=distance(items[i].hash,items[j].hash);if((same&&d===0)||d<=threshold)join(i,j)}
+const buckets=new Map();items.forEach((it,i)=>{const r=root(i);if(!buckets.has(r))buckets.set(r,[]);buckets.get(r).push(it)});groups=Array.from(buckets.values()).filter(g=>g.length>1).map(g=>({id:Math.min(...g.map(x=>x.id)),type:g.every(it=>it.width===g[0].width&&it.height===g[0].height&&it.hash===g[0].hash)?'exact':'similar',items:g})).sort((a,b)=>b.items.length-a.items.length);$('fileStatus').textContent=`Concluído: ${items.length} foto(s) analisada(s), ${groups.length} grupo(s) encontrado(s).`;render();updateStats()}catch(err){$('fileStatus').textContent='Erro durante a análise: '+err.message}finally{busy=false;$('analyze').disabled=!files.length}}
+function render(){const rootEl=$('results');rootEl.innerHTML='';const visible=groups.filter(g=>filter==='all'||(filter==='exact'?g.type==='exact':g.type==='similar'));if(!visible.length){rootEl.innerHTML=`<div class="empty">${groups.length?'Nenhum grupo nesta categoria.':'Nenhuma duplicata ou foto parecida encontrada. Tente mudar a sensibilidade.'}</div>`;return}for(const g of visible){const wrap=document.createElement('div');wrap.className='group';const head=document.createElement('div');head.className='grouphead';const left=document.createElement('div');left.innerHTML=`<strong>${g.type==='exact'?'Fotos visualmente iguais':'Fotos parecidas'}</strong><br><small>${g.items.length} fotos neste grupo</small>`;const btn=document.createElement('button');btn.className='secondary';btn.textContent='Selecionar todas menos a primeira';btn.onclick=()=>{g.items.slice(1).forEach(it=>selected.add(it.id));render();updateStats()};head.append(left,btn);wrap.append(head);const photos=document.createElement('div');photos.className='photos';g.items.forEach((it,idx)=>{const card=document.createElement('div');card.className='photo'+(selected.has(it.id)?' selected':'');const img=document.createElement('img');img.src=it.url;img.alt=it.name;img.loading='lazy';const info=document.createElement('div');info.className='info';const lab=document.createElement('label');lab.className='pick';const cb=document.createElement('input');cb.type='checkbox';cb.checked=selected.has(it.id);cb.onchange=()=>{cb.checked?selected.add(it.id):selected.delete(it.id);card.classList.toggle('selected',cb.checked);updateStats()};const span=document.createElement('span');span.textContent='Marcar para excluir';lab.append(cb,span);const name=document.createElement('div');name.className='name';name.textContent=it.name;const meta=document.createElement('div');meta.className='meta';meta.textContent=`${it.width} × ${it.height} • ${fmtBytes(it.size)}${idx===0?' • primeira do grupo':''}`;info.append(lab,name,meta);card.append(img,info);photos.append(card)});wrap.append(photos);rootEl.append(wrap)}}
+$('analyze').addEventListener('click',analyze);$('similarity').addEventListener('change',()=>{if(items.length)analyze()});$('selectExtras').onclick=()=>{groups.forEach(g=>g.items.slice(1).forEach(it=>selected.add(it.id)));render();updateStats()};$('clearSelected').onclick=()=>{selected.clear();render();updateStats()};$('showAll').onclick=()=>{filter='all';render()};$('showExact').onclick=()=>{filter='exact';render()};$('showSimilar').onclick=()=>{filter='similar';render()};$('exportList').onclick=()=>{const data=items.filter(it=>selected.has(it.id)).map(it=>({nome:it.name,tamanho_bytes:it.size,largura:it.width,altura:it.height,nota:'Seleção manual; confira o arquivo antes de excluir.'}));const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='fotos-selecionadas-para-revisao.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)};updateStats();
+</script></body></html>
